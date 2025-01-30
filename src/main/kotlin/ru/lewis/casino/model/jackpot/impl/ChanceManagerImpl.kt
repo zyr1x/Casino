@@ -1,5 +1,7 @@
 package ru.lewis.casino.model.jackpot.impl
 
+import me.lucko.helper.promise.Promise
+import ru.lewis.casino.extension.runAsync
 import ru.lewis.casino.model.Participant
 import ru.lewis.casino.model.jackpot.ChanceManager
 import ru.lewis.casino.model.jackpot.GameSession
@@ -36,22 +38,23 @@ class ChanceManagerImpl(
         }
     }
 
-    override fun getWinner(): Participant? {
-        val totalChance = gameSession.getParticipants().sumOf { it.percent }
+    override fun getWinner(): Promise<Participant?> {
+        return runAsync {
+            val totalChance = gameSession.getParticipants().sumOf { it.percent }
 
-        if (totalChance <= 0) return null
+            if (totalChance <= 0) return@runAsync null
 
-        val randomChance = Random.nextInt(1, 101)
+            val randomChance = Random.nextInt(1, 101)
 
-        var currentChance = 0
-        for (participant in gameSession.getParticipants()) {
-            currentChance += participant.percent
-            if (randomChance <= currentChance) {
-                return participant
+            var currentChance = 0
+            for (participant in gameSession.getParticipants()) {
+                currentChance += participant.percent
+                if (randomChance <= currentChance) {
+                    return@runAsync participant
+                }
             }
+            null
         }
-
-        return null
     }
 
     override fun getAllBet(): Int {

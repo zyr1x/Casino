@@ -72,10 +72,14 @@ class GameSessionImpl @Inject constructor(
     override fun startGame() {
         running = true
 
-        chanceManager?.let {
-            winner = it.getWinner()!!
-            animatedMenu = assistedInjectFactories.createAnimatedMenu(this, winner)
-            this.openMenuForParticipants()
+        chanceManager?.let { manager ->
+            manager.getWinner().thenApplySync {
+                it?.let {
+                    this.winner = it
+                    animatedMenu = assistedInjectFactories.createAnimatedMenu(this, winner)
+                    this.openMenuForParticipants()
+                }
+            }
         }
 
         broadcast(messages.common.gameStartAnimation.resolve(
