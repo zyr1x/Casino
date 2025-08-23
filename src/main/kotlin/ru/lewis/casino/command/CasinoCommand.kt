@@ -1,29 +1,30 @@
 package ru.lewis.casino.command
 
+import com.google.inject.Inject
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
-import jakarta.inject.Inject
 import org.bukkit.entity.Player
-import ru.lewis.casino.model.TableRegistry
+import ru.lewis.casino.model.SpinThread
+import ru.lewis.casino.model.menu.Menu
 import ru.lewis.casino.service.ConfigurationService
 
-@Command(name = "casino", aliases = ["jackpot"])
+@Command(name = "casino", aliases = ["bet"])
 class CasinoCommand @Inject constructor(
+    private val menu: Menu,
     private val configurationService: ConfigurationService,
-    private val tableRegistry: TableRegistry
+    private val spinThread: SpinThread
 ){
-
     @Execute
     fun execute(@Context player: Player) {
-        tableRegistry.tables.forEach { it.getGameSession()?.open(player) }
+        menu.openMenu(player)
     }
 
     @Execute(name = "reload")
     @Permission("casino.reload")
     fun reload() {
-        configurationService.reload()
-        tableRegistry.reload()
+        configurationService.run()
+        spinThread.reload()
     }
 }

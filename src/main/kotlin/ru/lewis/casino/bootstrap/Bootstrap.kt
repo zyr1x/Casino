@@ -1,19 +1,18 @@
 package ru.lewis.casino.bootstrap
 
-import com.google.inject.Guice
-import com.google.inject.Stage
-import me.lucko.helper.plugin.ExtendedJavaPlugin
+import com.google.inject.BindingAnnotation
+import org.bukkit.plugin.java.JavaPlugin
 import ru.lewis.casino.Main
+import ru.lewis.core.bootstrap.Bootstrap
 
-class Bootstrap : ExtendedJavaPlugin() {
-
+class Bootstrap : JavaPlugin() {
     private var disabled: Boolean = false
 
     private lateinit var entryPoint: Main
 
-    override fun enable() {
+    override fun onEnable() {
         try {
-            entryPoint = Guice.createInjector(Stage.PRODUCTION, InjectionModule(this)).getInstance(Main::class.java)
+            entryPoint = Bootstrap.injector.createChildInjector(InjectionModule(this)).getInstance(Main::class.java)
             entryPoint.start()
         } catch (e: Throwable) {
             slF4JLogger.error("Failed to enable", e)
@@ -21,10 +20,14 @@ class Bootstrap : ExtendedJavaPlugin() {
         }
     }
 
-    override fun disable() {
+    override fun onDisable() {
         if (::entryPoint.isInitialized && !disabled) {
             disabled = true
             entryPoint.stop()
         }
     }
 }
+
+@BindingAnnotation
+@Retention(AnnotationRetention.RUNTIME)
+annotation class CasinoPlugin

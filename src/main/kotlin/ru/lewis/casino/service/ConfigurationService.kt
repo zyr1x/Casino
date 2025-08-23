@@ -2,8 +2,6 @@ package ru.lewis.casino.service
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import me.lucko.helper.terminable.TerminableConsumer
-import me.lucko.helper.terminable.module.TerminableModule
 import org.bukkit.Material
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.enchantments.Enchantment
@@ -16,48 +14,46 @@ import org.spongepowered.configurate.kotlin.extensions.set
 import org.spongepowered.configurate.kotlin.objectMapperFactory
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import ru.lewis.casino.bootstrap.CasinoPlugin
+import ru.lewis.casino.configuration.CasinoMenuConfiguration
 import ru.lewis.casino.configuration.Configuration
-import ru.lewis.casino.configuration.MenusConfiguration
-import ru.lewis.casino.configuration.MessagesConfiguration
-import ru.lewis.casino.configuration.serializer.*
-import ru.lewis.casino.configuration.type.BossBarConfiguration
-import ru.lewis.casino.configuration.type.MiniMessageComponent
+import ru.lewis.casino.configuration.LocalizationConfiguration
+import ru.lewis.core.configuration.serializer.*
+import ru.lewis.core.configuration.type.MiniMessageComponent
+import ru.lewis.core.service.Service
 import java.awt.Color
 import java.time.Duration
 import kotlin.io.path.*
 
 @Singleton
 class ConfigurationService @Inject constructor(
-    private val plugin: Plugin,
-    private val materialSerializer: ru.lewis.casino.configuration.serializer.MaterialSerializer,
+    @CasinoPlugin private val plugin: Plugin,
+    private val materialSerializer: MaterialSerializer,
     private val durationSerializer: DurationSerializer,
     private val miniMessageComponentSerializer: MiniMessageComponentSerializer,
     private val colorSerializer: ColorSerializer,
     private val potionEffectSerializer: PotionEffectSerializer,
     private val enchantmentSerializer: EnchantmentSerializer,
-    private val bossBarConfigurationSerializer: BossBarConfigurationSerializer,
     private val attributeModifierSerializer: AttributeModifierSerializer,
+    private val potionEffectTypeSerializer: PotionEffectTypeSerializer,
     private val logger: Logger,
-    private val potionEffectTypeSerializer: PotionEffectTypeSerializer
-) : TerminableModule {
+) : Service {
 
     lateinit var config: Configuration
         private set
 
-    lateinit var menus: MenusConfiguration
+    lateinit var casinoMenu: CasinoMenuConfiguration
         private set
 
-    lateinit var messages: MessagesConfiguration
+    lateinit var localization: LocalizationConfiguration
         private set
 
-    private val rootDirectory = Path("")
-    private val settingsFile = plugin.dataFolder.toPath().resolve("settings.yml")
-    private val menusFile = plugin.dataFolder.toPath().resolve("menus.yml")
-    private val messagesFile = plugin.dataFolder.toPath().resolve("messages.yml")
+    private val path = plugin.dataFolder.toPath()
+    private val settingsFile = path.resolve("settings.yml")
+    private val casinoMenuFile = path.resolve("casino-menu.yml")
+    private val localizationFile = path.resolve("localization.yml")
 
-    override fun setup(consumer: TerminableConsumer) = doReload()
-
-    fun reload() = doReload()
+    override fun run() = doReload()
 
     fun saveConfig() {
         createLoaderBuilder().path(settingsFile).build().let {
@@ -74,8 +70,8 @@ class ConfigurationService @Inject constructor(
         plugin.dataFolder.toPath().createDirectories()
 
         config = createLoaderBuilder().path(settingsFile).build().getAndSave<Configuration>()
-        menus = createLoaderBuilder().path(menusFile).build().getAndSave<MenusConfiguration>()
-        messages = createLoaderBuilder().path(messagesFile).build().getAndSave<MessagesConfiguration>()
+        casinoMenu = createLoaderBuilder().path(casinoMenuFile).build().getAndSave<CasinoMenuConfiguration>()
+        localization = createLoaderBuilder().path(localizationFile).build().getAndSave<LocalizationConfiguration>()
     }
 
     private fun createLoaderBuilder(): YamlConfigurationLoader.Builder {
@@ -89,7 +85,6 @@ class ConfigurationService @Inject constructor(
                         .register(Color::class.java, colorSerializer)
                         .register(PotionEffect::class.java, potionEffectSerializer)
                         .register(Enchantment::class.java, enchantmentSerializer)
-                        .register(BossBarConfiguration::class.java, bossBarConfigurationSerializer)
                         .register(AttributeModifier::class.java, attributeModifierSerializer)
                         .register(PotionEffectType::class.java, potionEffectTypeSerializer)
                         .registerAnnotatedObjects(objectMapperFactory())
