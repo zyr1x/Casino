@@ -8,6 +8,8 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
 import ru.lewis.casino.bootstrap.CasinoPlugin
 import ru.lewis.casino.model.animation.SpinAnimation
+import ru.lewis.casino.model.event.CasinoPlayerLoseEvent
+import ru.lewis.casino.model.event.CasinoPlayerWinEvent
 import ru.lewis.casino.model.hologram.HologramBuilder
 import ru.lewis.casino.model.hologram.MyHologram
 import ru.lewis.casino.model.hologram.UpdatableHologramLine
@@ -92,8 +94,12 @@ class SpinThread @Inject constructor(
 
                     vaultRepository.depositPlayer(player, winAmount.toDouble())
                     player.sendMessage(messages.notifications.betWin.resolve(number("amount", winAmount)))
+
+                    Bukkit.getPluginManager().callEvent(CasinoPlayerWinEvent(player, amount, slot))
                 } else {
                     player.sendMessage(messages.notifications.betLoss)
+
+                    Bukkit.getPluginManager().callEvent(CasinoPlayerLoseEvent(player, amount, slot))
                 }
             }
         }

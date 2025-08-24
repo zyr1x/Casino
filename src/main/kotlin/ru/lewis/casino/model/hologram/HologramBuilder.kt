@@ -2,6 +2,7 @@ package ru.lewis.casino.model.hologram
 
 import eu.decentsoftware.holograms.api.holograms.HologramPage
 import org.bukkit.Location
+import org.bukkit.event.player.PlayerJoinEvent
 import java.util.UUID
 
 class HologramBuilder(private val location: Location) {

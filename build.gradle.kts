@@ -5,6 +5,9 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
+group = "ru.lewis.casino"
+version = "2.0"
+
 repositories {
     mavenCentral()
     mavenLocal()

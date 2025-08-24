@@ -42,5 +42,5 @@ data class Configuration(
     val spinDelay: Duration = Duration.ofMinutes(5),
     val location: LocationTemplate = LocationTemplate(-119.5, 105.0, -50.0, world = "spawn"),
     val hologramLocation: LocationTemplate = LocationTemplate(-119.5, 105.0, -50.0, world = "spawn"),
-    val radius: Int = 2
+    val radius: Int = 2,
 )
