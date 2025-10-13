@@ -39,12 +39,13 @@ class BetListener @Inject constructor(
                 player.sendMessage(messages.errors.notMoney)
                 return
             }
-            betManager.bet(player, amount, slot)
             betWaitingManager.removePlayer(player)
 
             player.sendMessage(messages.notifications.successfullyBet.resolve(slot.toPlaceholder(), number("amount", amount)))
         } catch (ignored: NumberFormatException) {
             player.sendMessage(messages.errors.onlyNumbers)
         }
+
+        betWaitingManager.removePlayer(player)
     }
 }
