@@ -3,8 +3,8 @@ package ru.lewis.casino.configuration
 import org.bukkit.Material
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import ru.lewis.casino.configuration.type.Slot
-import ru.lewis.core.configuration.type.ItemTemplate
-import ru.lewis.core.configuration.type.LocationTemplate
+import ru.lewis.casino.configuration.type.ItemTemplate
+import ru.lewis.casino.configuration.type.LocationTemplate
 import java.time.Duration
 
 @ConfigSerializable
@@ -43,4 +43,6 @@ data class Configuration(
     val location: LocationTemplate = LocationTemplate(-119.5, 105.0, -50.0, world = "spawn"),
     val hologramLocation: LocationTemplate = LocationTemplate(-119.5, 105.0, -50.0, world = "spawn"),
     val radius: Int = 2,
+    val isAxisX: Boolean = false,
+    val isRemainingHologramEnable: Boolean = false
 )

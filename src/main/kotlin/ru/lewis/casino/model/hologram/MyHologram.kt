@@ -13,12 +13,6 @@ class MyHologram : Hologram {
     constructor(name: String, location: Location, saveToFile: Boolean) :
             super(name, location, saveToFile)
 
-    constructor(name: String, location: Location, config: FileConfig?) :
-            super(name, location, config)
-
-    constructor(name: String, location: Location, config: FileConfig?, enabled: Boolean) :
-            super(name, location, config, enabled)
-
     override fun delete() {
         super.delete()
         this.pages.forEach { page: HologramPage? ->

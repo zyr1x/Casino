@@ -5,8 +5,7 @@ import com.google.inject.Singleton
 import org.bukkit.entity.Player
 import ru.lewis.casino.model.AssistedInjectFactories
 import ru.lewis.casino.service.ConfigurationService
-import ru.lewis.core.configuration.type.import
-import ru.lewis.core.configuration.type.playAnim
+import ru.lewis.casino.configuration.type.import
 import xyz.xenondevs.invui.window.Window
 
 @Singleton
@@ -25,7 +24,6 @@ class Menu @Inject constructor(
                 }
             }
             open(player)
-            gui.playAnim()
         }
     }
 }

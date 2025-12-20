@@ -1,8 +1,8 @@
 package ru.lewis.casino.configuration
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import ru.lewis.core.configuration.type.MiniMessageComponent
-import ru.lewis.core.extension.asMiniMessageComponent
+import ru.lewis.casino.configuration.type.MiniMessageComponent
+import ru.lewis.casino.extension.asMiniMessageComponent
 
 @ConfigSerializable
 data class LocalizationConfiguration(

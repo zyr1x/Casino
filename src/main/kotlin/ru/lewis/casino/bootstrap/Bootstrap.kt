@@ -1,9 +1,8 @@
 package ru.lewis.casino.bootstrap
 
-import com.google.inject.BindingAnnotation
+import com.google.inject.Guice
 import org.bukkit.plugin.java.JavaPlugin
 import ru.lewis.casino.Main
-import ru.lewis.core.bootstrap.Bootstrap
 
 class Bootstrap : JavaPlugin() {
     private var disabled: Boolean = false
@@ -12,7 +11,7 @@ class Bootstrap : JavaPlugin() {
 
     override fun onEnable() {
         try {
-            entryPoint = Bootstrap.injector.createChildInjector(InjectionModule(this)).getInstance(Main::class.java)
+            entryPoint = Guice.createInjector(InjectionModule(this)).getInstance(Main::class.java)
             entryPoint.start()
         } catch (e: Throwable) {
             slF4JLogger.error("Failed to enable", e)
@@ -27,7 +26,3 @@ class Bootstrap : JavaPlugin() {
         }
     }
 }
-
-@BindingAnnotation
-@Retention(AnnotationRetention.RUNTIME)
-annotation class CasinoPlugin

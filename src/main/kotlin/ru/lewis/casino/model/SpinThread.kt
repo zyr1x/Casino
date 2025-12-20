@@ -2,11 +2,12 @@ package ru.lewis.casino.model
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import com.onarandombox.MultiverseCore.MultiverseCore
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
-import ru.lewis.casino.bootstrap.CasinoPlugin
+
 import ru.lewis.casino.model.animation.SpinAnimation
 import ru.lewis.casino.model.event.CasinoPlayerLoseEvent
 import ru.lewis.casino.model.event.CasinoPlayerWinEvent
@@ -14,26 +15,29 @@ import ru.lewis.casino.model.hologram.HologramBuilder
 import ru.lewis.casino.model.hologram.MyHologram
 import ru.lewis.casino.model.hologram.UpdatableHologramLine
 import ru.lewis.casino.service.ConfigurationService
-import ru.lewis.core.extension.number
-import ru.lewis.core.service.game.GameService
+import ru.lewis.casino.extension.number
+import ru.lewis.casino.service.VaultService
 import kotlin.properties.Delegates
 
 @Singleton
 class SpinThread @Inject constructor(
     private val configurationService: ConfigurationService,
     private val spinAnimation: SpinAnimation,
-    @CasinoPlugin private val plugin: Plugin,
+    private val plugin: Plugin,
     private val betManager: BetManager,
-    private val gameService: GameService
+    private val vaultService: VaultService,
+    private val multiverseCore: MultiverseCore
 ) : BukkitRunnable() {
     private val config get() = configurationService.config
     private val messages get() = configurationService.localization.messages
     private val hologramConfiguration get() = configurationService.localization.hologram
-    private val vaultRepository get() = gameService.getVaultRepository()
-    private val location get() = config.hologramLocation.getLocation()
+    private val vaultRepository get() = vaultService.econ
+    private val location get() = config.hologramLocation.getLocation(multiverseCore)
+    private val isRemainingHologramEnable get() = config.isRemainingHologramEnable
 
-    private var remaining by Delegates.notNull<Long>()
     private var hologram: MyHologram? = null
+
+    var remaining by Delegates.notNull<Long>()
 
     fun start() {
         spinAnimation.spawn()
@@ -44,22 +48,28 @@ class SpinThread @Inject constructor(
     fun reload() {
         spinAnimation.reload()
         remaining = config.spinDelay.toSeconds()
+
         hologram?.delete()
-        hologram = createSpinHologram()
+
+        if (isRemainingHologramEnable) {
+            hologram = createSpinHologram()
+        }
     }
 
     override fun run() {
         if (remaining <= 0) {
-            hologram?.delete()
-            hologram = null
+            if (isRemainingHologramEnable) {
+                hologram?.delete()
+                hologram = null
+            }
 
-            val winSlot = spinAnimation.spin()
-            processBets(winSlot)
-            betManager.clearBets()
-            remaining = config.spinDelay.toSeconds()
-            return
+            spinAnimation.spin {
+                processBets(it)
+                betManager.clearBets()
+                remaining = config.spinDelay.toSeconds()
+            }
         }
-        if (hologram == null) hologram = createSpinHologram()
+        if (isRemainingHologramEnable && hologram == null) hologram = createSpinHologram()
 
         remaining--
     }
@@ -78,11 +88,8 @@ class SpinThread @Inject constructor(
             .build()
     }
 
-    fun formatRemaining(remaining: Long): String {
-        val minutes = remaining / 60
-        val seconds = remaining % 60
-        return String.format("%02d:%02d", minutes, seconds)
-    }
+    fun formatRemaining(remaining: Long): String =
+        "%02d:%02d".format(remaining / 60, remaining % 60)
 
     private fun processBets(winSlot: ru.lewis.casino.configuration.type.Slot) {
         betManager.allBets().forEach { (playerId, amount, slot) ->

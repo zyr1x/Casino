@@ -6,22 +6,20 @@ import io.papermc.paper.event.player.AsyncChatEvent
 import net.milkbowl.vault.economy.EconomyResponse
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import ru.lewis.casino.model.BetManager
 import ru.lewis.casino.model.BetWaitingManager
 import ru.lewis.casino.service.ConfigurationService
-import ru.lewis.core.extension.legacy
-import ru.lewis.core.extension.number
-import ru.lewis.core.service.game.GameService
+import ru.lewis.casino.extension.legacy
+import ru.lewis.casino.extension.number
+import ru.lewis.casino.service.VaultService
 
 @Singleton
 class BetListener @Inject constructor(
     private val betWaitingManager: BetWaitingManager,
-    private val betManager: BetManager,
     private val configurationService: ConfigurationService,
-    private val gameService: GameService
+    private val vaultService: VaultService
 ): Listener {
     private val messages get() = configurationService.localization.messages
-    private val vaultRepository get() = gameService.getVaultRepository()
+    private val vaultRepository get() = vaultService.econ
 
     @EventHandler
     fun onChat(event: AsyncChatEvent) {

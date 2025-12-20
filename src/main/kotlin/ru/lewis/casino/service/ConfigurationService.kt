@@ -14,20 +14,19 @@ import org.spongepowered.configurate.kotlin.extensions.set
 import org.spongepowered.configurate.kotlin.objectMapperFactory
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import ru.lewis.casino.bootstrap.CasinoPlugin
+
 import ru.lewis.casino.configuration.CasinoMenuConfiguration
 import ru.lewis.casino.configuration.Configuration
 import ru.lewis.casino.configuration.LocalizationConfiguration
-import ru.lewis.core.configuration.serializer.*
-import ru.lewis.core.configuration.type.MiniMessageComponent
-import ru.lewis.core.service.Service
+import ru.lewis.casino.configuration.serializer.*
+import ru.lewis.casino.configuration.type.MiniMessageComponent
 import java.awt.Color
 import java.time.Duration
 import kotlin.io.path.*
 
 @Singleton
 class ConfigurationService @Inject constructor(
-    @CasinoPlugin private val plugin: Plugin,
+    private val plugin: Plugin,
     private val materialSerializer: MaterialSerializer,
     private val durationSerializer: DurationSerializer,
     private val miniMessageComponentSerializer: MiniMessageComponentSerializer,

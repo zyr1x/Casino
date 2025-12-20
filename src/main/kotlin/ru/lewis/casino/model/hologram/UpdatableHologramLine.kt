@@ -8,8 +8,8 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
 import ru.lewis.casino.bootstrap.Bootstrap
-import ru.lewis.core.configuration.type.MiniMessageComponent
-import ru.lewis.core.extension.legacy
+import ru.lewis.casino.configuration.type.MiniMessageComponent
+import ru.lewis.casino.extension.legacy
 import java.lang.AutoCloseable
 import java.util.function.Supplier
 

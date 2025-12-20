@@ -2,9 +2,9 @@ package ru.lewis.casino.configuration
 
 import org.bukkit.Material
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import ru.lewis.core.configuration.type.ItemTemplate
-import ru.lewis.core.configuration.type.MenuConfig
-import ru.lewis.core.extension.asMiniMessageComponent
+import ru.lewis.casino.configuration.type.ItemTemplate
+import ru.lewis.casino.configuration.type.MenuConfig
+import ru.lewis.casino.extension.asMiniMessageComponent
 
 @ConfigSerializable
 data class CasinoMenuConfiguration(

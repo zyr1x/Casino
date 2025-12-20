@@ -2,6 +2,7 @@ package ru.lewis.casino.model.animation
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import com.onarandombox.MultiverseCore.MultiverseCore
 import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
 import eu.decentsoftware.holograms.api.holograms.HologramLine
@@ -10,22 +11,25 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitRunnable
-import ru.lewis.casino.bootstrap.CasinoPlugin
+
 import ru.lewis.casino.configuration.type.Slot
 import ru.lewis.casino.service.ConfigurationService
-import ru.lewis.core.extension.legacy
+import ru.lewis.casino.extension.legacy
 import java.util.*
+import java.util.function.Consumer
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Singleton
 class SpinAnimation @Inject constructor(
     private val configurationService: ConfigurationService,
-    @CasinoPlugin private val plugin: Plugin,
+    private val multiverseCore: MultiverseCore,
+    private val plugin: Plugin,
 ) {
     private val config get() = configurationService.config
-    private val center get() = configurationService.config.location.getLocation() // <- всегда клон
+    private val center get() = configurationService.config.location.getLocation(multiverseCore) // <- всегда клон
     private val radius get() = configurationService.config.radius
+    private val isAxisX get() = configurationService.config.isAxisX
 
     private lateinit var entities: MutableList<Entity>
 
@@ -49,7 +53,7 @@ class SpinAnimation @Inject constructor(
         updatePositions(center, radius, 0.0)
     }
 
-    fun spin(): Slot {
+    fun spin(callback: (Slot) -> Unit) {
         val winner = entities.random()
         val rounds = 3
         val targetAngle = (2 * Math.PI * rounds) + (Math.PI / 2 - winner.angle)
@@ -60,6 +64,7 @@ class SpinAnimation @Inject constructor(
         object : BukkitRunnable() {
             override fun run() {
                 if (currentAngle >= targetAngle) {
+                    callback(winner.slot)
                     cancel()
                     return
                 }
@@ -68,16 +73,24 @@ class SpinAnimation @Inject constructor(
                 updatePositions(center, radius, currentAngle)
             }
         }.runTaskTimer(plugin, 1L, 1L)
-
-        return winner.slot
     }
 
     private fun updatePositions(center: Location, radius: Int, offset: Double) {
         entities.forEach { entity ->
             val angle = entity.angle + offset
-            val x = center.x + radius * cos(angle)
-            val y = center.y + radius * sin(angle)
-            val z = center.z
+            val x: Double
+            var y: Double
+            var z: Double
+
+            if (isAxisX) {
+                x = center.x + radius * cos(angle)
+                y = center.y + radius * sin(angle)
+                z = center.z
+            } else {
+                x = center.x
+                y = center.y + radius * sin(angle)
+                z = center.z + radius * cos(angle)
+            }
 
             val loc = center.clone().apply {
                 this.x = x

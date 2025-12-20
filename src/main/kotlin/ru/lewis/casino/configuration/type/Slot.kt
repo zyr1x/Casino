@@ -3,8 +3,8 @@ package ru.lewis.casino.configuration.type
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Material
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import ru.lewis.core.configuration.type.ItemTemplate
-import ru.lewis.core.extension.number
+import ru.lewis.casino.configuration.type.ItemTemplate
+import ru.lewis.casino.extension.number
 
 @ConfigSerializable
 data class Slot(
